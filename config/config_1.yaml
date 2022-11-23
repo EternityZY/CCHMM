@@ -1,0 +1,80 @@
+dataset_name: test.npz
+device: cuda:1
+expid: 1
+log_level: INFO
+model_name: CausalHMM
+runs: 1
+test_only: True
+base_path: data/train_data
+
+data:
+  freq: 30min
+  name: bj_speed
+  num_for_predict: 6
+  num_for_target: 1
+  num_of_days: 0
+  num_of_hours: 1
+  num_of_weeks: 0
+  num_shift: 0
+  points_per_hour: 2
+  test_batch_size: 64
+  train_batch_size: 64
+  use_external: True
+  val_batch_size: 64
+
+model:
+  adj: affinity
+  context_channels: [ 56, 5, 22 ]   # time poi weather
+  context_dims: [ 32, 32, 32 ]
+  input_channels: [ 2, 2, 2, 1 ]
+  output_channels: [ 2, 2, 2, 1 ]
+  hidden_num: 5
+  hidden_dim: 64
+  gcn_depth: 1
+
+  mu_type: split
+  var_type: none
+
+  Posterior_type: GraphGRU
+  Prior_type: GraphGRU
+  SCM_type: nonlinear
+  activation_type: relu
+  use_reparameterize: True
+  dropout_prob: 0
+  pred_z_init: attention
+  amplify_alpha: 3
+  nonlinear_activation: tanh
+
+  # poi bike taxi bus speed
+  init_DAG: [[1,0,0,0,0],
+             [0,1,0,0,0],
+             [0,0,1,0,0],
+             [0,0,0,1,0],
+             [0,0,0,0,1]]
+
+  norm_graph: sym
+
+
+train:
+  base_lr: 0.0005
+  weight_decay: 0.0001
+  epoch_start: 0
+  epochs: 200
+  global_step: 0
+  load_initial: True
+
+  max_grad_norm: 5
+  milestones: [40, 80, 120, 160, 200]
+  lr_decay_ratio: 0.5
+
+  min_learning_rate: 2.0e-06
+  print_every: 1
+  tolerance: 50
+
+  loss_weight: 1
+  DAG_loss_weight: 1
+
+  best_mode: Results/CausalHMM/CCHMM.pth
+
+
+  description:
